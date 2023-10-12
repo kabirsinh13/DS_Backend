@@ -3,12 +3,14 @@
 const express = require('express')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const multer = require('multer')
 const cors = require('cors')
 require('dotenv').config()
 const {connection} = require('./db.js')
 
 
 const User = require('./Schema/user.js')
+const Post = require('./Schema/posts.js')
 
 const bodyParser = require('body-parser')
 
@@ -16,6 +18,7 @@ const bodyParser = require('body-parser')
 
 
 const app = express()
+const upload = multer()
 
 app.use(bodyParser.urlencoded({extended:true}))
 app.use(bodyParser.json())
@@ -38,9 +41,9 @@ app.post('/createuser',async (req,res)=>{
 
 app.post('/user/login',async (req,res)=>{
     //Finding user in Database by email
-    console.log(req.body.email,req.body.password)
+    // console.log(req.body.email,req.body.password)
     const user =await User.findOne({email:req.body.email})
-
+    
     //User not found in Database
     if(!user){
         return res.status(404).send("User not found")
@@ -67,6 +70,15 @@ app.post('/user/login',async (req,res)=>{
     }
 })
 
+app.post('/createpost',upload.array('photos',12),async (req,res)=>{
+         const newPost = new Post({
+            ...req.body,
+            file:req.files
+         })
+
+         await newPost.save()
+         res.send()
+})
 
 //it will send user post from backend to frontend after recieving user id from frontend
 //authenticated route
