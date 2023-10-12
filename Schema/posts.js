@@ -16,6 +16,12 @@ const postSchema = new Schema({
         type:String,
         require:true
     },
+    file:[
+        {
+            type:Object,
+            require:true
+        }
+    ],
     commentsBy:[
         {
             type:mongoose.Schema.Types.ObjectId,
