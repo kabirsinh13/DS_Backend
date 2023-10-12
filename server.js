@@ -82,8 +82,11 @@ app.post('/createpost',upload.array('photos',12),async (req,res)=>{
 
 //it will send user post from backend to frontend after recieving user id from frontend
 //authenticated route
-app.post('/mypost',(req,res)=>{
-    res.send("this is your post")
+app.post('/mypost',async (req,res)=>{
+    const userId = req.body.id;
+    const result = await Post.find({postedBy:userId})
+
+    res.send(result)
 })
 
 connection().then(
