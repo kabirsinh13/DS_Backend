@@ -89,6 +89,11 @@ app.post('/mypost',async (req,res)=>{
     res.send(result)
 })
 
+app.get("/allpost",async (req,res)=>{
+    const posts = await Post.find({})
+    res.send(posts)
+})
+
 connection().then(
     ()=>{
         app.listen(3000,()=>{
