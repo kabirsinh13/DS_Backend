@@ -94,6 +94,11 @@ app.get("/allpost",async (req,res)=>{
     res.send(posts)
 })
 
+app.post('/postbyid',async (req,res)=>{
+    const post = await Post.findById({_id:req.body.id})
+    res.send(post)
+})
+
 connection().then(
     ()=>{
         app.listen(3000,()=>{
