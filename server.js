@@ -11,6 +11,8 @@ const {connection} = require('./db.js')
 
 const User = require('./Schema/user.js')
 const Post = require('./Schema/posts.js')
+const Comment = require('./Schema/comments.js')
+const Like = require('./Schema/likes.js')
 
 const bodyParser = require('body-parser')
 
@@ -30,7 +32,7 @@ app.get('/',(req,res)=>{
     res.send("hello")
 })
 
-app.post('/createuser',async (req,res)=>{
+app.post('/user/signup',async (req,res)=>{
      const user = new User({...req.body})
      const response =  await user.save()
      const token = jwt.sign({_id:response._id.toString()},process.env.JWT_KEY,{expiresIn:'7 days'})
@@ -95,10 +97,56 @@ app.get("/allpost",async (req,res)=>{
 })
 
 app.post('/postbyid',async (req,res)=>{
-    const post = await Post.findById({_id:req.body.id})
+    const post = await Post.findById({_id:req.body.id}).populate('postedBy','name').populate('commentsBy.comments').exec()
     res.send(post)
 })
 
+app.post('/postcomment',async (req,res)=>{
+    const newComment = new Comment({
+        userId:req.body.userid,
+        contents:req.body.contents,
+        userName:req.body.userName
+    })
+
+    const response = await newComment.save()// get the comment collection reference 
+    const comments = response._id
+    const post = await Post.findById({_id:req.body.postid})
+    post.commentsBy = post.commentsBy.concat({comments})
+    await post.save()
+        // await response.populate('userId','name')
+    res.send(response)
+
+})
+
+app.post('/likepost',async (req,res)=>{
+    const newLiked = new Like({
+         userId:req.body.userid,
+         userName:req.body.userName,
+         postId:req.body.postid,
+         isLike:req.body.isLike
+    })
+    const response = await newLiked.save()
+    const likes = response._id
+    const post = await Post.findById({_id:req.body.postid})
+    post.likedBy = post.likedBy.concat({likes})
+    await post.save()
+    res.send("liked successfully")
+})
+
+app.post('/unlikepost',async (req,res)=>{
+    const userid = req.body.userid
+    const like = await Like.findOne({$and:[{userId:userid},{postId:req.body.postid}]})
+    await Like.deleteOne({_id:like._id})
+    await Post.updateOne({_id:req.body.postid},{$pull:{likedBy:{likes:like._id}}})
+    res.send("unliked successfully")
+})
+app.post('/getLike',async (req,res)=>{
+    const like = await Like.findOne({$and:[{userId:req.body.userid},{postId:req.body.postid}]})
+    if(like!==null)
+    res.send(like.isLike);
+    else
+    res.send(false)
+})
 connection().then(
     ()=>{
         app.listen(3000,()=>{
