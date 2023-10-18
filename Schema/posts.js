@@ -2,6 +2,9 @@ const mongoose = require('mongoose')
 const User = require('./user.js')
 const {Schema} = mongoose
 
+const Comment = require('./comments.js')
+const Like = require('./likes.js')
+
 const postSchema = new Schema({
     postedBy:{
         type:mongoose.Schema.Types.ObjectId,
@@ -24,21 +27,46 @@ const postSchema = new Schema({
     ],
     commentsBy:[
         {
-            type:mongoose.Schema.Types.ObjectId,
-            ref:'User',
-            require:false
+            comments:{
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'Comment'
+            },
+            
         }
     ],
+
     likedBy:[
         {
-            type:mongoose.Schema.Types.ObjectId,
-            ref:'User',
-            require:false
+            likes:{
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'Like'
+            }
         }
-    ]
+    ],
 
-})
+    commentCount:{
+        type:Number
+    },
+    likeCount:{
+        type:Number
+    }
+
+},{toObject:{virtuals:true}},{toJSON:{virtuals:true}})
+
+// postSchema.virtual('commentsBy',{
+//     ref:'Comment',
+//     localField:'_id',
+//     foreignField:'postId'
+
+// })
+
+// postSchema.virtual('likedBy',{
+//     ref:'Like',
+//     localField:'_id',
+//     foreignField:'postId'
+// })
 
 const Post = mongoose.model('Post',postSchema)
+
 
 module.exports = Post
