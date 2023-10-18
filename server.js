@@ -130,7 +130,7 @@ app.post('/likepost',async (req,res)=>{
     const post = await Post.findById({_id:req.body.postid})
     post.likedBy = post.likedBy.concat({likes})
     await post.save()
-    res.send("liked successfully")
+    res.send("Liked successfully")
 })
 
 app.post('/unlikepost',async (req,res)=>{
@@ -138,7 +138,7 @@ app.post('/unlikepost',async (req,res)=>{
     const like = await Like.findOne({$and:[{userId:userid},{postId:req.body.postid}]})
     await Like.deleteOne({_id:like._id})
     await Post.updateOne({_id:req.body.postid},{$pull:{likedBy:{likes:like._id}}})
-    res.send("unliked successfully")
+    res.send("Unliked successfully")
 })
 app.post('/getLike',async (req,res)=>{
     const like = await Like.findOne({$and:[{userId:req.body.userid},{postId:req.body.postid}]})
