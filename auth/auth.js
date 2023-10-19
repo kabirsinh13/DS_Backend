@@ -1,18 +1,16 @@
-const User = require('../../schema/users.js');
+const User = require('../Schema/user.js');
 const jwt = require('jsonwebtoken')
-
+require('dotenv').config()
 
 
 
 const auth = async(req,res,next) =>{
     try{
         const getToken = req.headers.authorization.replace('Bearer','').trim();
-        const payload = jwt.verify(getToken,process.env.JWTSECRET);
-        const user = await User.findById(payload._id);
-        // console.log(user)
-
+        const payload = jwt.verify(getToken,process.env.JWT_KEY);
         if(!payload)
             throw new Error()
+        const user = await User.findById(payload._id);
         req.user = user;
         req.token = getToken;
         next();
