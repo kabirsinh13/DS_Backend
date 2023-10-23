@@ -7,12 +7,14 @@ const User = require('../Schema/user.js')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
+const auth = require('../auth/auth.js')
+
 router.use(cors())
 
 router.post('/user/signup',async (req,res)=>{
     const user = new User({...req.body})
     const response =  await user.save()
-    const token = jwt.sign({_id:response._id.toString()},process.env.JWT_KEY,{expiresIn:'7 days'})
+    const token = jwt.sign({_id:response._id.toString()},process.env.JWT_KEY,{expiresIn:'6 minutes'})
     response.tokens = response.tokens.concat({token});
     await response.save()
     res.send(response)
@@ -47,6 +49,24 @@ router.post('/user/login',async (req,res)=>{
    else{
        res.status(401).send("wrong password");
    }
+
+router.post('/user/logout',auth,async (req,res)=>{
+    try{
+        
+        const user = await User.findById(req.user._id)
+        
+        if(!user)
+           throw new Error();
+        user.tokens = user.tokens.filter((token)=>{
+                return token.token !== req.token
+        })
+        await user.save();
+        res.status(200).send("Logout successfully");
+    }
+    catch(e){
+        res.status(401).send("Logout failed")
+    }
+   })
 })
 
 
