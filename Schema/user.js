@@ -6,23 +6,26 @@ const bcrypt = require('bcrypt')
 const userSchema = new Schema({
     name:{
         type:String,
-        require:true
+        require:true,
     },
     email:{
         type:String,
-        require:true
+        require:true,
+        validate(value){
+            return value!==null
+        }
     },
     password:{
         type:String,
         trim:true,
         minLength:7,
         validate(value){
-          return value!=='password'
+          return value!=='password'  || value!==null
         }
     },
     age:{
         type:Number,
-        require:true
+        require:true,
     },
     postCount:{
         type:Number,
