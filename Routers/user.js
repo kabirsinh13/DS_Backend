@@ -4,17 +4,18 @@ const router = express.Router()
 
 const cors = require('cors')
 const User = require('../Schema/user.js')
+const Like = require('../Schema/likes.js')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-
 const auth = require('../auth/auth.js')
+
 
 router.use(cors())
 
 router.post('/user/signup',async (req,res)=>{
     const user = new User({...req.body})
     const response =  await user.save()
-    const token = jwt.sign({_id:response._id.toString()},process.env.JWT_KEY,{expiresIn:'6 minutes'})
+    const token = jwt.sign({_id:response._id.toString()},process.env.JWT_KEY,{expiresIn:'7 days'})
     response.tokens = response.tokens.concat({token});
     await response.save()
     res.send(response)
@@ -37,7 +38,7 @@ router.post('/user/login',async (req,res)=>{
    if(isMatch){
 
        //generating token for logged in user
-       const token = jwt.sign({_id:user._id.toString()},process.env.JWT_KEY,{expiresIn:'5 minutes'})
+       const token = jwt.sign({_id:user._id.toString()},process.env.JWT_KEY,{expiresIn:'60 minutes'})
 
        //Storing token in database
        user.tokens = user.tokens.concat({token});
@@ -49,24 +50,12 @@ router.post('/user/login',async (req,res)=>{
    else{
        res.status(401).send("wrong password");
    }
+})
 
-router.post('/user/logout',auth,async (req,res)=>{
-    try{
-        
-        const user = await User.findById(req.user._id)
-        
-        if(!user)
-           throw new Error();
-        user.tokens = user.tokens.filter((token)=>{
-                return token.token !== req.token
-        })
-        await user.save();
-        res.status(200).send("Logout successfully");
-    }
-    catch(e){
-        res.status(401).send("Logout failed")
-    }
-   })
+router.get('/user/likedpost',auth,async (req,res)=>{
+   //it will return all like collection which were liked by this user
+   const userLiked = await Like.find({userId:req.user._id}).populate('postId')
+   res.send(userLiked)
 })
 
 
