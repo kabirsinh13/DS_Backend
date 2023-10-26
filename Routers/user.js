@@ -6,6 +6,7 @@ const cors = require('cors')
 const User = require('../Schema/user.js')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const Like = require('../Schema/likes.js')
 
 const auth = require('../auth/auth.js')
 
