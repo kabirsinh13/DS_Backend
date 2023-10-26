@@ -52,10 +52,25 @@ router.post('/user/login',async (req,res)=>{
    }
 })
 
-router.get('/user/likedpost',auth,async (req,res)=>{
-   //it will return all like collection which were liked by this user
-   const userLiked = await Like.find({userId:req.user._id}).populate('postId')
-   res.send(userLiked)
+
+router.post('/user/logout',auth,async (req,res)=>{
+    try{
+        
+        const user = await User.findById(req.user._id)
+        
+        if(!user)
+           throw new Error();
+        user.tokens = user.tokens.filter((token)=>{
+                return token.token !== req.token
+        })
+        await user.save();
+        res.status(200).send("Logout successfully");
+    }
+    catch(e){
+        res.status(401).send("Logout Failed")
+    }
+   })
+
 })
 
 
