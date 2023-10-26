@@ -5,6 +5,7 @@ const router = express.Router()
 const Post = require('../Schema/posts.js')
 const Comment = require('../Schema/comments.js')
 const Like = require('../Schema/likes.js')
+const User = require('../Schema/user.js')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
@@ -23,6 +24,10 @@ router.post('/createpost',auth,upload.array('photos',12),async (req,res)=>{
     })
 
     await newPost.save()
+
+    const response = await User.findOneAndUpdate(
+      {_id:req.user._id},
+      {$inc: {postCount: 1}})
     res.send()
 })
 
