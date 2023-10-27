@@ -44,6 +44,15 @@ const postSchema = new Schema({
         }
     ],
 
+    viewedBy:[
+        {
+            views:{
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'View'
+            }
+        }
+    ],
+
     commentCount:{
         type:Number
     },

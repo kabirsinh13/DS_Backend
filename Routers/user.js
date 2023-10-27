@@ -15,7 +15,7 @@ router.use(cors())
 router.post('/user/signup',async (req,res)=>{
     const user = new User({...req.body})
     const response =  await user.save()
-    const token = jwt.sign({_id:response._id.toString()},process.env.JWT_KEY,{expiresIn:'6 minutes'})
+    const token = jwt.sign({_id:response._id.toString()},process.env.JWT_KEY,{expiresIn:'60 minutes'})
     response.tokens = response.tokens.concat({token});
     await response.save()
     res.send(response)
@@ -38,7 +38,7 @@ router.post('/user/login',async (req,res)=>{
    if(isMatch){
 
        //generating token for logged in user
-       const token = jwt.sign({_id:user._id.toString()},process.env.JWT_KEY,{expiresIn:'5 minutes'})
+       const token = jwt.sign({_id:user._id.toString()},process.env.JWT_KEY,{expiresIn:'60 minutes'})
 
        //Storing token in database
        user.tokens = user.tokens.concat({token});

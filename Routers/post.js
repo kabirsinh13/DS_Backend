@@ -6,6 +6,7 @@ const Post = require('../Schema/posts.js')
 const Comment = require('../Schema/comments.js')
 const Like = require('../Schema/likes.js')
 const User = require('../Schema/user.js')
+const View = require('../Schema/views.js')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
@@ -97,5 +98,26 @@ else
 res.send(false)
 })
 
+router.post('/getView',auth,async (req,res)=>{
+   const view = await View.find({$and:[{viewedBy:req.body.userid},{post:req.body.postid}]})
+
+   if(view.length!==0){
+      res.send(view[0].isViewed)
+   }
+   else{
+      const view = new View({
+         viewedBy:req.body.userid,
+         post:req.body.postid,
+         isViewed:true
+      })
+      const result = await view.save()
+      const viewsId = result._id
+      const post = await Post.findById({_id:req.body.postid})
+      post.viewedBy = post.viewedBy.concat({viewsId})
+
+      await post.save()
+      res.send(false)
+   }
+})
 
 module.exports = router
