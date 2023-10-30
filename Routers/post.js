@@ -47,7 +47,7 @@ res.send(posts)
 })
 
 router.post('/postbyid',auth,async (req,res)=>{
-const post = await Post.findById({_id:req.body.id}).populate('postedBy','name').populate('commentsBy.comments').exec()
+const post = await Post.findById({_id:req.body.id}).populate('postedBy','name _id').populate('commentsBy.comments').exec()
 res.send(post)
 })
 
@@ -113,11 +113,39 @@ router.post('/getView',auth,async (req,res)=>{
       const result = await view.save()
       const viewsId = result._id
       const post = await Post.findById({_id:req.body.postid})
-      post.viewedBy = post.viewedBy.concat({viewsId})
+      post.viewedBy = post.viewedBy.concat({views:viewsId})
 
       await post.save()
       res.send(false)
    }
 })
+
+router.post('/ratepost',auth,async (req,res)=>{
+   const rateValue = req.body.rate
+   console.log(rateValue)
+    const post = await Post.findById({_id:req.body.postid}).populate('postedBy','name')
+
+    post.ratedBy = post.ratedBy.concat({rate:rateValue,user:req.user._id})
+    const result =await post.save()
+   //  console.log(post)
+    res.send(result)
+})
+
+router.post("/israted",auth,async (req,res)=>{
+   const result = await Post.find({$and:[{"_id":req.body.postid},{"ratedBy.user":req.user._id}]})
+   if(result.length===0)
+   res.send(false)
+   else
+   res.send(true)
+})
+
+//this route is going to delete post but not all comments related to this post
+router.post("/deletepost",auth,async(req,res)=>{
+   await Post.deleteOne({_id:req.body.postid})
+   await Like.deleteMany({postId:req.body.postid})
+   await View.deleteMany({post:req.body.postid})
+   res.send({"result":"post delete successfully"})
+})
+
 
 module.exports = router
