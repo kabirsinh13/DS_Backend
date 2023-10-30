@@ -47,7 +47,7 @@ res.send(posts)
 })
 
 router.post('/postbyid',auth,async (req,res)=>{
-const post = await Post.findById({_id:req.body.id}).populate('postedBy','name').populate('commentsBy.comments').exec()
+const post = await Post.findById({_id:req.body.id}).populate('postedBy','name _id').populate('commentsBy.comments').exec()
 res.send(post)
 })
 
@@ -138,4 +138,14 @@ router.post("/israted",auth,async (req,res)=>{
    else
    res.send(true)
 })
+
+//this route is going to delete post but not all comments related to this post
+router.post("/deletepost",auth,async(req,res)=>{
+   await Post.deleteOne({_id:req.body.postid})
+   await Like.deleteMany({postId:req.body.postid})
+   await View.deleteMany({post:req.body.postid})
+   res.send({"result":"post delete successfully"})
+})
+
+
 module.exports = router
