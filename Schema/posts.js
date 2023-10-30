@@ -52,6 +52,17 @@ const postSchema = new Schema({
             }
         }
     ],
+    ratedBy:[
+       {
+        rate:{
+            type:Number,
+            default:0
+        },
+        user:{
+            type:mongoose.Schema.Types.ObjectId
+        }
+       }
+    ],
 
     commentCount:{
         type:Number
