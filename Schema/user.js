@@ -24,16 +24,6 @@ const userSchema = new Schema({
         type:Number,
         require:true
     },
-    postCount:{
-        type:Number,
-        require:false,
-        default:0
-    },
-    likeCount:{
-        type:Number,
-        require:false,
-        default:0
-    },
     tokens:[{
           token: {
             type:String,
