@@ -78,15 +78,25 @@ router.get('/user/likedpost',auth,async (req,res)=>{
  })
 
  router.post('/user/updateuser', auth,upload.single('profilePic'), async (req,res)=>{
-    
-    const response = await User.findByIdAndUpdate({_id:req.user._id},{
-        $set:{
-            name : req.body.name,
-            age : req.body.age,
-            profilePic : req.file
-        }
-    })
-    res.send()
+    let response = null;
+    if(req.file!==undefined){
+        response = await User.findByIdAndUpdate({_id:req.user._id},{
+            $set:{
+                name : req.body.name,
+                age : req.body.age,
+                profilePic : req.file
+            }
+        })
+        res.send(response.profilePic)
+    }else{
+        await User.findByIdAndUpdate({_id:req.user._id},{
+            $set:{
+                name : req.body.name,
+                age : req.body.age,
+            }
+        })
+        res.send(false)
+    }
  })
 
 
