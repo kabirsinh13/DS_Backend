@@ -36,7 +36,11 @@ const userSchema = new Schema({
             default:"token"
         }
         }  
-    ]
+    ],
+    profilePic:{
+        type:Object,
+        require:false
+    }
 })
 
 userSchema.virtual('posts',{

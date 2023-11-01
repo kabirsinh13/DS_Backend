@@ -144,6 +144,7 @@ router.post("/deletepost",auth,async(req,res)=>{
    await Post.deleteOne({_id:req.body.postid})
    await Like.deleteMany({postId:req.body.postid})
    await View.deleteMany({post:req.body.postid})
+   await User.findByIdAndUpdate({_id:req.user._id},{$inc:{postCount:-1}})
    res.send({"result":"post delete successfully"})
 })
 

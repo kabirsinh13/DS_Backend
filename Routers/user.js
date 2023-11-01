@@ -7,9 +7,10 @@ const User = require('../Schema/user.js')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Like = require('../Schema/likes.js')
-
+const multer = require('multer')
 const auth = require('../auth/auth.js')
 
+const upload = multer()
 router.use(cors())
 
 router.post('/user/signup',async (req,res)=>{
@@ -74,6 +75,18 @@ router.get('/user/likedpost',auth,async (req,res)=>{
     //it will return all like collection which were liked by this user
     const userLiked = await Like.find({userId:req.user._id}).populate('postId')
     res.send(userLiked)
+ })
+
+ router.post('/user/updateuser', auth,upload.single('profilePic'), async (req,res)=>{
+    
+    const response = await User.findByIdAndUpdate({_id:req.user._id},{
+        $set:{
+            name : req.body.name,
+            age : req.body.age,
+            profilePic : req.file
+        }
+    })
+    res.send()
  })
 
 
