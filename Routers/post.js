@@ -80,6 +80,10 @@ const likes = response._id
 const post = await Post.findById({_id:req.body.postid})
 post.likedBy = post.likedBy.concat({likes})
 await post.save()
+await User.findOneAndUpdate(
+   {_id:req.user._id},
+   {$inc: {likeCount: 1}})
+
 res.send("Liked successfully")
 })
 
@@ -88,6 +92,9 @@ const userid = req.body.userid
 const like = await Like.findOne({$and:[{userId:userid},{postId:req.body.postid}]})
 await Like.deleteOne({_id:like._id})
 await Post.updateOne({_id:req.body.postid},{$pull:{likedBy:{likes:like._id}}})
+await User.findOneAndUpdate(
+   {_id:req.user._id},
+   {$inc: {likeCount: -1}})
 res.send("Unliked successfully")
 })
 router.post('/getLike',auth,async (req,res)=>{

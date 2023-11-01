@@ -29,6 +29,11 @@ const userSchema = new Schema({
         require:false,
         default:0
     },
+    likeCount:{
+        type:Number,
+        require:false,
+        default:0
+    },
     tokens:[{
           token: {
             type:String,
