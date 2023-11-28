@@ -36,13 +36,14 @@ router.post('/createpost',auth,upload.array('photos',12),async (req,res)=>{
 //authenticated route
 router.post('/mypost',auth,async (req,res)=>{
 const userId = req.user._id;
-const result = await Post.find({postedBy:userId})
+const result = (await Post.find({postedBy:userId})).reverse()
 
 res.send(result)
 })
 
 router.get("/allpost",async (req,res)=>{
-const posts = await Post.find({})
+const posts = (await Post.find({})).reverse()
+
 res.send(posts)
 })
 
